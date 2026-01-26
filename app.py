@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
 
 st.title('産業と従業員')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
@@ -25,9 +25,18 @@ with st.sidebar:
     st.header('表示設定')
     display_option=st.selectbox('表示内容',['基本データ','男女比グラフ'])
 
-filtered=df[df.iloc[:,7].str.contains(selected_job,na=False,regex=False)]
+filtered_df=df[df.iloc[:,7].str.contains(selected_job,na=False,regex=False)]
 
-if not df.empty:
-    target_row =df.iloc[0]
-    st.write(f"### {selected_job} のデータ一覧")
-    st.dataframe(df)
+if not filtered_df.empty:
+    target_row=filtered_df.iloc[0]
+    st.write(f'{selected_job} のデータ一覧')
+    st.dataframe(filtered_df)
+
+    st.write('就業者の男女比較')
+    labels=['男性','女性']
+    
+    try:
+        male_count=pd.to_numeric(target_row.iloc[8], errors='coerce')
+        female_count=pd.to_numeric(target_row.iloc[9], errors='coerce')
+        
+        counts=[male_count,female_count]
