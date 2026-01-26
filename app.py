@@ -31,4 +31,3 @@ if not df.empty:
     target_row =df.iloc[0]
     st.write(f"### {selected_job} のデータ一覧")
     st.dataframe(df)
-    
