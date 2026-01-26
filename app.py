@@ -26,3 +26,9 @@ with st.sidebar:
     display_option=st.selectbox('表示内容',['基本データ','男女比グラフ'])
 
 filtered=df[df.iloc[:,7].str.contains(selected_job,na=False,regex=False)]
+
+if not df.empty:
+    target_row =df.iloc[0]
+    st.write(f"### {selected_job} のデータ一覧")
+    st.dataframe(df)
+    
