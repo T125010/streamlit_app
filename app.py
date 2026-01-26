@@ -6,6 +6,9 @@ st.title('産業と従業員')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
 df.rename(columns={df.columns[7]:'産業名'},inplace=True)
 
+# デバッグ用：最初の20行の「産業名」を画面に出して確認する
+st.write("CSVの中身（産業名列）:", df['産業名'].head(20))
+
 main_jobs=[
     "コンビニエンスストア",
     "菓子・パン小売業",
@@ -25,7 +28,7 @@ with st.sidebar:
     st.header('表示設定')
     display_option=st.selectbox('表示内容',['基本データ','男女比グラフ'])
 
-filtered_df=df[df.iloc[:,7].str.contains(selected_job,na=False,regex=False)]
+filtered_df=df[df.iloc[:,7].str.contains(selected_job,na=False,)]
 
 if not filtered_df.empty:
     target_row=filtered_df.iloc[0]
@@ -45,3 +48,9 @@ if not filtered_df.empty:
         ax.bar(labels, counts, color=['skyblue','pink'])
         ax.set_ylabel('人数')
         ax.set_title(f'{selected_job} の就業者数内訳')
+
+        st.pyplot(fig)
+    except:
+        st.error('データの数値変換に失敗しました。')
+else:
+    st.warning('データが見つかりませんでした。')
