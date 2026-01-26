@@ -6,29 +6,28 @@ st.title('産業と従業員')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
 df.rename(columns={df.columns[7]:'産業名'},inplace=True)
 
-# デバッグ用：最初の20行の「産業名」を画面に出して確認する
-st.write("CSVの中身（産業名列）:", df['産業名'].head(20))
 
-main_jobs=[
-    "コンビニエンスストア",
-    "菓子・パン小売業",
-    "機械器具小売業",
-    "繊維・衣服等卸売業",
-    "飲食料品卸売業",
-    "百貨店・総合スーパー",
-    "医薬品・化粧品小売業",
-    "通信販売・訪問販売小売業"
-]
+main_jobs={
+    'コンビニエンスストア':'5891',
+    '菓子・パン小売業':'586',
+    '機械器具小売業':'59',
+    '繊維・衣服等卸売業':'51',
+    '飲食料品卸売業':'52',
+    '百貨店・総合スーパー':'561',
+    '医薬品・化粧品小売業':'603',
+    '通信販売・訪問販売小売業':'611'
+}
 
 with st.sidebar:
     st.header('フィルタ設定')
-    selected_job=st.selectbox('分析したい業種を選択してください',main_jobs)
+    selected_job=st.selectbox('分析したい業種を選択してください',list(main_jobs.keys()))
+    selected_code=main_jobs[selected_job]
 
     st.divider()
     st.header('表示設定')
     display_option=st.selectbox('表示内容',['基本データ','男女比グラフ'])
 
-filtered_df=df[df.iloc[:,7].str.contains(selected_job,na=False,)]
+filtered_df=df[df['産業名'].astype(str).str.contains(selected_code,na=False,)]
 
 if not filtered_df.empty:
     target_row=filtered_df.iloc[0]
