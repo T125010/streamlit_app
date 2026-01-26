@@ -20,3 +20,9 @@ main_jobs=[
 with st.sidebar:
     st.header('フィルタ設定')
     selected_job=st.selectbox('分析したい業種を選択してください',main_jobs)
+
+    st.divider()
+    st.header('表示設定')
+    display_option=st.selectbox('表示内容',['基本データ','男女比グラフ'])
+
+filtered=df[df.iloc[:,7].str.contains(selected_job,na=False,regex=False)]
