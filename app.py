@@ -40,3 +40,8 @@ if not filtered_df.empty:
         female_count=pd.to_numeric(target_row.iloc[9], errors='coerce')
         
         counts=[male_count,female_count]
+
+        fig,ax=plt.subplots(figsize=(8,5))
+        ax.bar(labels, counts, color=['skyblue','pink'])
+        ax.set_ylabel('人数')
+        ax.set_title(f'{selected_job} の就業者数内訳')
