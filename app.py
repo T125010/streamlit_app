@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 
 st.title('産業と従業員')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
-df_clean=df.iloc[:,[7,8,9]].copy() 
+
+df_clean=df.iloc[:,[8,9,10]].copy() 
 df_clean.columns=['産業コード名','男性','女性']
 
 
@@ -31,26 +31,25 @@ filtered_df = df_clean[df_clean['産業コード名'].astype(str).str.contains('
 
 if not filtered_df.empty:
     target_row=filtered_df.iloc[0]
-    if display_option == '表を確認':
-        st.write(f"### {selected_job} の抽出データ")
-        st.write("必要な列（コード・男・女）だけを表示しています")
-        st.table(filtered_df) 
+    if display_option == '表を表示':
+        st.write(f"{selected_job} の抽出データ")
+        st.table(filtered_df.assign(index=None).set_index('index'))
         
     else:
-        st.write(f"### {selected_job} の就業者数（男女比）")
+        st.write(f"{selected_job} の就業者数（男女比）")
+
+        def clean_speed(x):
+            s = str(x).replace(',', '').replace(' ', '').replace('　', '')
+            return pd.to_numeric(s, errors='coerce')
         
         m = pd.to_numeric(str(target_row['男性']).replace(',', ''), errors='coerce')
         f = pd.to_numeric(str(target_row['女性']).replace(',', ''), errors='coerce')
         
-        if pd.notnull(m) and pd.notnull(f):
+        if pd.notnull(m) and pd.notnull(f) and (m + f) > 0:
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.bar(['男性', '女性'], [m, f], color=['skyblue', 'pink'])
-            ax.set_title(f"{selected_job} の男女比")
+            ax.bar(['男性', '女性'], [m, f], color=['#87CEEB', '#FFB6C1'])
+            ax.set_ylim(0,max(m,f)*1.2)
             st.pyplot(fig)
             
-            ratio = (f / (m + f)) * 100
-            st.info(f"この業種の女性比率は **{ratio:.1f}%** です。")
-        else:
-            st.error("数値データが見つかりませんでした。")
-else:
-    st.warning(f'「{selected_job}(コード:{selected_code})」のデータが見つかりませんでした。')
+
+            st.error("数値が取得できません。CSVの列番号（現在 8列目と9列目）が正しいか確認してください。")
