@@ -4,7 +4,7 @@ import pandas as pd
 st.title('産業と従業員分析アプリ')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
 
-df_clean=df.iloc[:,[8,9,10]].copy() 
+df_clean=df.iloc[:,[7,10,11]].copy() 
 df_clean.columns=['産業名','男性','女性']
 
 
