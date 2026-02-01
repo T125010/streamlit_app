@@ -4,8 +4,8 @@ import pandas as pd
 st.title('産業と従業員分析アプリ')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
 
-df_clean=df.iloc[:,[7,10,11]].copy() 
-df_clean.columns=['産業名','男性','女性']
+df_clean = df.iloc[:, [7,8,10,11]].copy() 
+df_clean.columns = ['コード', '産業名', '男性', '女性']
 
 
 main_jobs={
@@ -26,13 +26,12 @@ with st.sidebar:
     st.divider()
     display_option=st.radio('表示設定',['表を表示','グラフを表示'])
 
-filtered_df = df_clean[df_clean['産業名'].astype(str).str.contains(str(selected_code), na=False)]
+filtered_df = df_clean[df_clean['コード'].astype(str).str.contains(str(selected_code), na=False)]
 
 if not filtered_df.empty:
     target_row=filtered_df.iloc[0]
     if display_option == '表を表示':
-        st.write(f"{selected_job} の抽出データ")
-        st.dataframe(filtered_df.assign(index=None).set_index('index'))
+        st.dataframe(filtered_df)
         
     else:
         st.write(f"{selected_job} の就業者数（男女比）")
@@ -45,20 +44,19 @@ if not filtered_df.empty:
         f = to_num(target_row['女性'])
         
         if pd.notnull(m) and pd.notnull(f):
-            chart_data = pd.DataFrame(
-                [m, f],
-                index=['男性', '女性'],
-                columns=['人数']
-            )
-            st.bar_chart(chart_data)
+            chart_data = pd.DataFrame({
+                '性別': ['男性', '女性'],
+                '人数': [m, f]
+            })
+            color_map={"男性":"#0000FF","女性":"#FF0000"}
+            st.bar_chart(chart_data, x="性別", y="人数", color="性別")
             
             total = m + f
             if total > 0:
                 ratio = (f / total) * 100
                 st.subheader("💡 データからわかること")
-                st.write(f"女性の割合は **{ratio:.1f}%** です。")
+                st.write(f"女性の割合は {ratio:.1f}% です。")
         else:
             st.error("データの数値化に失敗しました。")
-            st.write(f"デバッグ情報: 男={target_row['男性']}, 女={target_row['女性']}")
 else:
-    st.warning('指定されたコードのデータが見つかりませんでした。')
+    st.warning('データが見つかりませんでした。')
