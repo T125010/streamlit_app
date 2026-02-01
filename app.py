@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 st.title('産業と従業員')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
-df.rename(columns={df.columns[7]:'産業名'},inplace=True)
+df_clean=df.iloc[:,[7,8,9]].copy() 
+df_clean.columns=['産業コード名','男性','女性']
 
 
 main_jobs={
@@ -24,32 +25,32 @@ with st.sidebar:
     selected_code=main_jobs[selected_job]
 
     st.divider()
-    st.header('表示設定')
-    display_option=st.selectbox('表示内容',['基本データ','男女比グラフ'])
+    display_option=st.radio('表示設定',['表を表示','グラフを表示'])
 
-filtered_df=df[df['産業名'].astype(str).str.contains(selected_code,na=False,)]
+filtered_df = df_clean[df_clean['産業コード名'].astype(str).str.contains('^' + selected_code, na=False)]
 
 if not filtered_df.empty:
     target_row=filtered_df.iloc[0]
-    st.write(f'{selected_job} のデータ一覧')
-    st.dataframe(filtered_df)
-
-    st.write('就業者の男女比較')
-    labels=['男性','女性']
-    
-    try:
-        male_count=pd.to_numeric(target_row.iloc[8], errors='coerce')
-        female_count=pd.to_numeric(target_row.iloc[9], errors='coerce')
+    if display_option == '表を確認':
+        st.write(f"### {selected_job} の抽出データ")
+        st.write("必要な列（コード・男・女）だけを表示しています")
+        st.table(filtered_df) 
         
-        counts=[male_count,female_count]
-
-        fig,ax=plt.subplots(figsize=(8,5))
-        ax.bar(labels, counts, color=['skyblue','pink'])
-        ax.set_ylabel('人数')
-        ax.set_title(f'{selected_job} の就業者数内訳')
-
-        st.pyplot(fig)
-    except:
-        st.error('データの数値変換に失敗しました。')
+    else:
+        st.write(f"### {selected_job} の就業者数（男女比）")
+        
+        m = pd.to_numeric(str(target_row['男性']).replace(',', ''), errors='coerce')
+        f = pd.to_numeric(str(target_row['女性']).replace(',', ''), errors='coerce')
+        
+        if pd.notnull(m) and pd.notnull(f):
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.bar(['男性', '女性'], [m, f], color=['skyblue', 'pink'])
+            ax.set_title(f"{selected_job} の男女比")
+            st.pyplot(fig)
+            
+            ratio = (f / (m + f)) * 100
+            st.info(f"この業種の女性比率は **{ratio:.1f}%** です。")
+        else:
+            st.error("数値データが見つかりませんでした。")
 else:
-    st.warning('データが見つかりませんでした。')
+    st.warning(f'「{selected_job}(コード:{selected_code})」のデータが見つかりませんでした。')
