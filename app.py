@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import japanize_matplotlib
 
 st.title('産業と従業員分析アプリ')
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
@@ -44,12 +46,17 @@ if not filtered_df.empty:
         f = to_num(target_row['女性'])
         
         if pd.notnull(m) and pd.notnull(f):
-            chart_data = pd.DataFrame({
-                '性別': ['男性', '女性'],
-                '人数': [m, f]
-            })
-            color_map={"男性":"#0000FF","女性":"#FF0000"}
-            st.bar_chart(chart_data, x="性別", y="人数", color="性別")
+            fig, ax = plt.subplots(figsize=(8, 5))
+            
+            labels = ['男性', '女性']
+            values = [m, f]
+            colors = ['#0000ff', '#ff0000'] 
+            
+            ax.bar(labels, values, color=colors)
+            ax.set_ylabel('人数')
+            ax.set_title(f"{target_row['産業名']} の男女内訳")
+            
+            st.pyplot(fig)
             
             total = m + f
             if total > 0:
