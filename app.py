@@ -46,13 +46,31 @@ if not filtered_df.empty:
         f = to_num(target_row['女性'])
         
         if pd.notnull(m) and pd.notnull(f):
+
+            total = m + f
+            ratio = (f / total) * 100 if total > 0 else 0
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("総就業者数", f"{int(total):,}人")
+            with col2:
+                st.metric("女性の割合", f"{ratio:.1f}%", delta=f"{ratio-50:.1f}% (基準50%)")
+            
+            st.divider() 
             fig, ax = plt.subplots(figsize=(8, 5))
             
-            labels = ['男性', '女性']
-            values = [m, f]
-            colors = ['#0000ff', '#ff0000'] 
+            labels=['男性', '女性']
+            values=[m, f]
+            colors=['#0000ff', '#ff0000'] 
             
-            ax.bar(labels, values, color=colors)
+            bars=ax.bar(labels, values, color=colors)
+
+            for bar in bars:
+                height=bar.get_height()
+                ax.annotate(f'{int(height):,}人',
+                            xy=(bar.get_x() + bar.get_width() / 2, height),
+                            xytext=(0, 3),  # 3ポイント上にずらす
+                            textcoords="offset points",
+                            ha='center', va='bottom', fontsize=12, fontweight='bold')
             ax.set_ylabel('人数')
             ax.set_title(f"{target_row['産業名']} の男女内訳")
             
