@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 
 st.title('産業と従業員分析アプリ')
+st.write("このアプリは、政府統計(e-Stat)のデータに基づき、主要な小売・卸売業の男女比を分析するためのツールです。サイドバーから業種を選択して、傾向を確認してください。")
 df=pd.read_csv('data.csv',encoding='utf-8', skiprows=10)
 
 df_clean = df.iloc[:, [7,8,10,11]].copy() 
@@ -31,6 +32,12 @@ with st.sidebar:
 filtered_df = df_clean[df_clean['コード'].astype(str).str.contains(str(selected_code), na=False)]
 
 if not filtered_df.empty:
+    st.download_button(
+        label="📥 抽出されたデータをCSVとしてダウンロード",
+        data=filtered_df.to_csv(index=False).encode('utf-8-sig'), 
+        file_name=f"{selected_job}_data.csv",
+        mime='text/csv',
+    )
     target_row=filtered_df.iloc[0]
     if display_option == '表を表示':
         st.dataframe(filtered_df)
@@ -72,8 +79,9 @@ if not filtered_df.empty:
                             textcoords="offset points",
                             ha='center', va='bottom', fontsize=12, fontweight='bold')
             ax.set_ylabel('人数')
+            ax.set_ylim(0, max(values) * 1.3)
             ax.set_title(f"{target_row['産業名']} の男女内訳")
-            
+            plt.tight_layout()
             st.pyplot(fig)
             
             total = m + f
