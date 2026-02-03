@@ -35,3 +35,4 @@
 ・Matplotlibによるグラフ表示のエラー（日本語文字化けや数値の見切れ）の修正案作成。
 ・READMEの構成案と文章の整理。
 ・e-Stat風のダッシュボード構成にするためのUI配置（st.columns等）のブレインストーミング。
+・requirements.txtの修正。
